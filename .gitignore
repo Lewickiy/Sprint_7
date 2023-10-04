@@ -40,3 +40,4 @@ build/
 !/.allure/allure-2.15.0/bin/allure.bat
 !/.allure/allure-2.15.0/config/allure.yml
 /.allure/
+/.allure/
