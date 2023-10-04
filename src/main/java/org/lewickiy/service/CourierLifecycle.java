@@ -5,6 +5,7 @@ import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
 import org.lewickiy.entity.Courier;
+import org.lewickiy.entity.Credentials;
 
 import static io.restassured.RestAssured.given;
 import static org.lewickiy.ApiEndpoints.*;
@@ -22,8 +23,8 @@ public class CourierLifecycle {
     }
 
     @Step("Courier authorization")
-    public ValidatableResponse registeredCourierLogin(Courier courier) {
-        return rootRequest().body(courier).when().post(LOGIN_COURIER_PATH).then().log().all();
+    public ValidatableResponse registeredCourierLogin(Credentials credentials) {
+        return rootRequest().body(credentials).when().post(LOGIN_COURIER_PATH).then().log().all();
     }
 
     @Step("Removing a courier")

@@ -3,6 +3,7 @@ import io.qameta.allure.Step;
 import io.qameta.allure.junit4.DisplayName;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.lewickiy.entity.Courier;
 import org.lewickiy.entity.Credentials;
@@ -15,30 +16,36 @@ import java.net.HttpURLConnection;
 import static org.hamcrest.CoreMatchers.equalTo;
 
 public class CourierCreationTest {
+    static CourierLifecycle courierLifecycle;
+    static CourierAssertions courierAssertions;
     Courier courier;
-    Courier duplicateCourier;
     Credentials credentials;
-    CourierLifecycle courierLifecycle;
-    CourierAssertions courierAssertions;
     Integer courierId;
+
+    @BeforeClass
+    public static void setUpBeforeClass() {
+        courierLifecycle = new CourierLifecycle();
+        courierAssertions = new CourierAssertions();
+    }
 
     @Before
     @Step("Creating a courier data set for registration and authorization")
-    public void setUp() {
+    public void setUpBeforeTest() {
         courier = CourierGenerator.random();
         credentials = Credentials.from(courier);
-        courierLifecycle = new CourierLifecycle();
-        courierAssertions = new CourierAssertions();
     }
 
     @After
     @Step("Removing a courier by id if the value is not empty")
     public void deleteCourier() {
-        //TODO login take courier id, then delete courier by id
-        //courierLifecycle.registeredCourierLogin(courier);
+        if (courier.getLogin() != null && courier.getPassword() != null) {
+            courierId = courierLifecycle.registeredCourierLogin(credentials).extract().path("id");
+        }
         if (courierId != null) {
-            System.out.println(courierId + "!!!!!!!!!!!");
-            courierLifecycle.deleteCourierById(courierId).log().all().assertThat().statusCode(HttpURLConnection.HTTP_OK);
+            courierLifecycle.deleteCourierById(courierId)
+                    .log().all()
+                    .assertThat()
+                    .statusCode(HttpURLConnection.HTTP_OK);
         }
     }
 
@@ -47,7 +54,6 @@ public class CourierCreationTest {
     @DisplayName("Registration of a new courier")
     @Description("We check that the new courier is registered and returns a response code 201 - created and \"ok\": true")
     public void createNewCourier() {
-        duplicateCourier = courier;
         courierLifecycle.createCourier(courier)
                 .assertThat()
                 .statusCode(HttpURLConnection.HTTP_CREATED)
@@ -57,7 +63,6 @@ public class CourierCreationTest {
     @Test
     @Step
     @DisplayName("Registering a new courier with empty field values")
-    @Description("")
     public void createNullCourier() {
         courierAssertions.notEnoughDataCreatingCourier(new Courier());
     }
@@ -65,7 +70,6 @@ public class CourierCreationTest {
     @Test
     @Step
     @DisplayName("Registering a new courier with empty login field")
-    @Description("")
     public void createNullLoginFieldCourier() {
         courier.setLogin(null);
         courierAssertions.notEnoughDataCreatingCourier(courier);
@@ -74,7 +78,6 @@ public class CourierCreationTest {
     @Test
     @Step
     @DisplayName("Registering a new courier with empty password field")
-    @Description("")
     public void createNullPasswordFieldCourier() {
         courier.setPassword(null);
         courierAssertions.notEnoughDataCreatingCourier(courier);

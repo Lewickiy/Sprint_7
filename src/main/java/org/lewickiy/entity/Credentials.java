@@ -28,6 +28,14 @@ public class Credentials implements CourierJson {
         this.password = password;
     }
 
+    @Override
+    public String toString() {
+        return "Credentials{" +
+                "login='" + login + '\'' +
+                ", password='" + password + '\'' +
+                '}';
+    }
+
     public static Credentials from(Courier courier) {
         return new Credentials(courier.getLogin(), courier.getPassword());
     }

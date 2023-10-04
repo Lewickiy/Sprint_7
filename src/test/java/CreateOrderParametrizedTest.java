@@ -19,7 +19,7 @@ import static org.lewickiy.entity.Color.BLACK;
 import static org.lewickiy.entity.Color.GREY;
 
 @RunWith(Parameterized.class)
-public class CreateOrderTest {
+public class CreateOrderParametrizedTest {
     static OrderLifecycle orderLifecycle;
     Order order;
     Integer orderId;
@@ -27,49 +27,42 @@ public class CreateOrderTest {
     @Parameterized.Parameter
     public Color[] colors;
 
-    @Parameterized.Parameters
+    @Parameterized.Parameters(name = "An array of colors {0} is added to the order")
     public static Object[][] getTestData() {
         return new Object[][] {
                 {new Color[] {GREY, BLACK}},
-                {new Color[] {GREY}},
-                {new Color[] {}}
+                {new Color[] {GREY, null}},
+                {new Color[] {null, null}}
         };
     }
-            /*
-        Проверь, что когда создаёшь заказ:
-        можно указать один из цветов — BLACK или GREY;
-        можно указать оба цвета;
-        можно совсем не указывать цвет;
-        тело ответа содержит track.
-        Чтобы протестировать создание заказа, нужно использовать параметризацию.
-            */
 
     @BeforeClass
-    @Step("")
+    @Step("Before running all tests, an instance of the OrderLifecycle class is created")
     public static void setUpBeforeClass() {
         orderLifecycle = new OrderLifecycle();
     }
 
     @Before
-    @Step("Creating a courier data set for registration and authorization")
+    @Step("Before the test, an instance of the Order class is created")
     public void setUpBeforeTest() {
         order = OrderGenerator.random();
     }
 
     @After
-    @Step()
-    public void deleteOrder() {
+    @Step("After the test the order is canceled")
+    public void cancelOrder() {
         orderLifecycle.cancelOrder(orderId).assertThat().statusCode(HttpURLConnection.HTTP_OK);
     }
 
     @Test
-    @DisplayName("Creating an order returns the track number")
-    @Description("")
-    public void orderCreationReturnsTrackNumber() {
+    @DisplayName("Creating an order with a combination of parameters")
+    @Description("It is possible to create an Order with one or two color options, or without color options")
+    public void orderCreateCombinationColorsParameters() {
         order.setColor(colors);
         orderId = orderLifecycle.createOrder(order)
                 .log().all()
                 .statusCode(HttpURLConnection.HTTP_CREATED)
-                .body("track", notNullValue()).extract().path("track");
+                .body("track", notNullValue())
+                .extract().path("track");
     }
 }
