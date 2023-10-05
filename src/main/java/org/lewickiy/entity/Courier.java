@@ -1,6 +1,6 @@
 package org.lewickiy.entity;
 
-public class Courier implements CourierJson {
+public class Courier {
     private String login;
     private String password;
     private String firstName;

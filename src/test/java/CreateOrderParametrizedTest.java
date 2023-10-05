@@ -31,8 +31,9 @@ public class CreateOrderParametrizedTest {
     public static Object[][] getTestData() {
         return new Object[][] {
                 {new Color[] {GREY, BLACK}},
-                {new Color[] {GREY, null}},
-                {new Color[] {null, null}}
+                {new Color[] {GREY}},
+                {new Color[] {BLACK}},
+                {new Color[] {null}}
         };
     }
 
